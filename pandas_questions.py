@@ -55,7 +55,11 @@ def merge_referendum_and_areas(referendum, regions_and_departments):
     """
 
     ref = referendum.copy()
-    mask_metropole = ~ref['Department code'].astype(str).str.contains('Z', na=False)
+    mask_metropole = (
+        ~ref["Department code"]
+        .astype(str)
+        .str.contains("Z", na=False)
+    )
     ref = ref.loc[mask_metropole].copy()
     ref['code_dep'] = ref['Department code'].astype(str).str.zfill(2)
 
@@ -91,11 +95,15 @@ def plot_referendum_map(referendum_result_by_regions):
     """
 
     geo_regions = gpd.read_file('data/regions.geojson')
-    geo_regions = geo_regions.rename(columns={'code': 'code_reg', 'nom': 'name_reg'})
+    geo_regions = geo_regions.rename(columns={'code': 'code_reg',
+                                              'nom': 'name_reg'})
 
     referendum = referendum_result_by_regions.reset_index()
-    merged = geo_regions.merge(referendum, on=['code_reg', 'name_reg'], how='inner')
-
+    merged = geo_regions.merge(
+        referendum,
+        on=["code_reg", "name_reg"],
+        how="inner",
+    )
     expressed = merged['Choice A'] + merged['Choice B']
     merged['ratio'] = merged['Choice A'] / expressed
 
